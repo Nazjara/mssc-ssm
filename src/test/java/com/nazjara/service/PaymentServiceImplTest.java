@@ -4,14 +4,14 @@ import com.nazjara.model.Payment;
 import com.nazjara.model.PaymentState;
 import com.nazjara.repository.PaymentRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 @SpringBootTest
 class PaymentServiceImplTest {
@@ -29,7 +29,7 @@ class PaymentServiceImplTest {
         payment = Payment.builder().amount(new BigDecimal("20")).build();
     }
 
-    @Test
+    @RepeatedTest(10)
     @Transactional
     void preAuth() {
         Payment savedPayment = paymentService.create(payment);
