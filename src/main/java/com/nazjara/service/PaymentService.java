@@ -8,7 +8,8 @@ import org.springframework.statemachine.StateMachine;
 public interface PaymentService {
 
     Payment create(Payment payment);
-    StateMachine<PaymentState, PaymentEvent> preAuth(Long paymentId);
+    StateMachine<PaymentState, PaymentEvent> preAuthorize(Long paymentId);
+    StateMachine<PaymentState, PaymentEvent> declinePreAuthorization(Long paymentId);
     StateMachine<PaymentState, PaymentEvent> authorize(Long paymentId);
-    StateMachine<PaymentState, PaymentEvent> declineAuthorize(Long paymentId);
+    StateMachine<PaymentState, PaymentEvent> declineAuthorization(Long paymentId);
 }

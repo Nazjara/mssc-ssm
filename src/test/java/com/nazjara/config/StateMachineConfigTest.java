@@ -8,6 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineFactory;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 @SpringBootTest
 class StateMachineConfigTest {
 
@@ -20,14 +22,14 @@ class StateMachineConfigTest {
 
         stateMachine.start();
 
-        System.out.println(stateMachine.getState().toString());
+        assertSame(stateMachine.getState().getId(), PaymentState.NEW);
 
         stateMachine.sendEvent(PaymentEvent.PRE_AUTH);
 
-        System.out.println(stateMachine.getState().toString());
+        assertSame(stateMachine.getState().getId(), PaymentState.PRE_AUTH);
 
-        stateMachine.sendEvent(PaymentEvent.PRE_AUTH_APPROVED);
+        stateMachine.sendEvent(PaymentEvent.AUTH);
 
-        System.out.println(stateMachine.getState().toString());
+        assertSame(stateMachine.getState().getId(), PaymentState.AUTH_ERROR);
     }
 }

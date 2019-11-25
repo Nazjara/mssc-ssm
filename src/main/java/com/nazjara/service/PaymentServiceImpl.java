@@ -11,6 +11,7 @@ import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,36 +23,50 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentStateChangeInterceptor paymentStateChangeInterceptor;
 
     @Override
+    @Transactional
     public Payment create(Payment payment) {
         payment.setState(PaymentState.NEW);
         return paymentRepository.save(payment);
     }
 
     @Override
-    public StateMachine<PaymentState, PaymentEvent> preAuth(Long paymentId) {
+    @Transactional
+    public StateMachine<PaymentState, PaymentEvent> preAuthorize(Long paymentId) {
         StateMachine<PaymentState, PaymentEvent> stateMachine = build(paymentId);
 
         sendEvent(paymentId, stateMachine, PaymentEvent.PRE_AUTH);
 
-        return null;
+        return stateMachine;
     }
 
     @Override
+    @Transactional
     public StateMachine<PaymentState, PaymentEvent> authorize(Long paymentId) {
         StateMachine<PaymentState, PaymentEvent> stateMachine = build(paymentId);
 
-        sendEvent(paymentId, stateMachine, PaymentEvent.AUTH_APPROVED);
+        sendEvent(paymentId, stateMachine, PaymentEvent.AUTH);
 
-        return null;
+        return stateMachine;
     }
 
     @Override
-    public StateMachine<PaymentState, PaymentEvent> declineAuthorize(Long paymentId) {
+    @Transactional
+    public StateMachine<PaymentState, PaymentEvent> declinePreAuthorization(Long paymentId) {
+        StateMachine<PaymentState, PaymentEvent> stateMachine = build(paymentId);
+
+        sendEvent(paymentId, stateMachine, PaymentEvent.PRE_AUTH_DECLINED);
+
+        return stateMachine;
+    }
+
+    @Override
+    @Transactional
+    public StateMachine<PaymentState, PaymentEvent> declineAuthorization(Long paymentId) {
         StateMachine<PaymentState, PaymentEvent> stateMachine = build(paymentId);
 
         sendEvent(paymentId, stateMachine, PaymentEvent.AUTH_DECLINED);
 
-        return null;
+        return stateMachine;
     }
 
     private void sendEvent(Long paymentId, StateMachine<PaymentState, PaymentEvent> stateMachine, PaymentEvent paymentEvent) {
